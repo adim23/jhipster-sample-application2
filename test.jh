@@ -1,17 +1,16 @@
 entity Region {
-	regionName String required
+	name String required
 }
 
 entity Country {
-	countryName String required
+	name String required
 }
 
 // an ignored comment
 /** not an ignored comment */
 entity Location {
-	streetAddress String
+	address String
 	postalCode String
-	city String
 	stateProvince String
 }
 
@@ -61,8 +60,8 @@ entity Employee {
 	hireDateTime Instant
 	zonedHireDateTime ZonedDateTime
 	hireDate LocalDate
-	salary Long min(0)
-	commissionPct Long min(0) max(100)
+	salary Double min(0)
+	commissionPct Double min(0) max(100)
     duration Duration
     pict ImageBlob maxbytes(20971520)
     comments TextBlob
@@ -71,9 +70,10 @@ entity Employee {
 }
 
 entity Job {
-	jobTitle String required
-	minSalary Long min(0)
-	maxSalary Long
+	title String required
+    description String
+	minSalary Double min(0)
+	maxSalary Double
 }
 
 enum Language {
@@ -86,9 +86,13 @@ entity JobHistory {
 	language Language required
 }
 
+relationship OneToOne {
+	Employee{internalUser} to User
+}
+
 relationship OneToMany {
 	Region{country} to Country
-	Location{country} to Country
+	Location{region} to Region
 	Department{location} to Location
 	JobHistory{job} to Job
 	JobHistory{department} to Department
@@ -113,7 +117,7 @@ relationship ManyToOne {
 	Employee{manager} to Employee{employees}
 	Task{dependsOn} to Task{dependents}
     Files{parent} to Files{children}
-    Files{createdBy} to User
+    Files{createdBy} to Employee
 }
 
 // Set pagination options
