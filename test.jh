@@ -1,0 +1,133 @@
+entity Region {
+	regionName String required
+}
+
+entity Country {
+	countryName String required
+}
+
+// an ignored comment
+/** not an ignored comment */
+entity Location {
+	streetAddress String
+	postalCode String
+	city String
+	stateProvince String
+}
+
+entity Department {
+	departmentName String required
+}
+
+/**
+ * Task entity.
+ * @author The JHipster team.
+ */
+entity Task {
+	title String required
+	description String
+	startDate LocalDate required
+	endDate LocalDate
+	percentCompleted Long min(0) max(100)
+}
+
+enum FileType {
+    FOLDER, FILE, LINK
+}
+
+entity Files {
+	uuid UUID
+    filename String
+    fileType FileType
+    fileSize Long
+    createDate LocalDate
+    filePath String
+    version String
+    mime String
+}
+
+/**
+ * The Employee entity.
+ */
+entity Employee {
+	/**
+	* The firstname attribute.
+	*/
+	firstName String required
+	lastName String required
+	fullName String required
+	email String required unique pattern(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)
+	phoneNumber String
+	hireDateTime Instant
+	zonedHireDateTime ZonedDateTime
+	hireDate LocalDate
+	salary Long min(0)
+	commissionPct Long min(0) max(100)
+    duration Duration
+    pict ImageBlob maxbytes(20971520)
+    comments TextBlob
+    cv Blob
+    active Boolean
+}
+
+entity Job {
+	jobTitle String required
+	minSalary Long min(0)
+	maxSalary Long
+}
+
+enum Language {
+    FRENCH, ENGLISH, SPANISH
+}
+
+entity JobHistory {
+	startDate LocalDate required
+	endDate LocalDate
+	language Language required
+}
+
+relationship OneToMany {
+	Region{country} to Country
+	Location{country} to Country
+	Department{location} to Location
+	JobHistory{job} to Job
+	JobHistory{department} to Department
+	JobHistory{employee} to Employee
+}
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+	Employee{job} to Job{employee}
+	/**
+	* A relationship
+	*/
+	Department{employee} to
+	/**
+	* Another side of the same relationship
+	*/
+	Employee{department}
+}
+
+relationship ManyToOne {
+	Job{task} to Task{job}
+	Employee{manager} to Employee{employees}
+	Task{dependsOn} to Task{dependents}
+    Files{parent} to Files{children}
+    Files{createdBy} to User
+}
+
+// Set pagination options
+// paginate JobHistory with infinite-scroll
+paginate all with pagination
+
+// Use Data Transfert Objects (DTO)
+// dto * with mapstruct
+
+// Set service options to all except few
+//service all with serviceImpl except Employee, Job
+service all with serviceImpl
+// filter Job
+filter all
+
+// Set an angular suffix
+// angularSuffix * with mySuffix
